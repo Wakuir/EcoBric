@@ -34,7 +34,22 @@ public class MarketData {
         itemStack.writeNbt(compound);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(compound);
+        String json = gson.toJson(compound);
+
+        int indexOfField;
+        if(json != null){
+            indexOfField = json.indexOf("field_")
+            json.replace(json.substring(indexOfField, indexOfField + 10), "entries");
+        }
+        while(json.contains("field_")){
+            indexOfField = json.indexOf("field_");
+            String toReplace = "";
+            if(json.substring(indexOfField, indexOfField - 5).contains("[")) toReplace = "entries";
+            else toReplace = "value"
+            
+            json.replace(json.substring(indexOfField, indexOfField + 10), toReplace);
+        }
+        return json;
     }
 
     public static ItemStack ItemStackFromJson(String json) {
