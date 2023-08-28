@@ -1,9 +1,7 @@
 package fr.wakleg.market.screen.handler;
 
-import fr.wakleg.ecobric.util.IEntityDataSaver;
 import fr.wakleg.ecobric.util.MoneyManager;
-import fr.wakleg.market.screen.ModScreenHandlers;
-import fr.wakleg.market.screen.NonInteractiveSlot;
+import fr.wakleg.market.screen.slot.NonInteractiveSlot;
 import fr.wakleg.market.util.MarketData;
 import fr.wakleg.market.util.MarketItem;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,6 +11,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,8 +21,12 @@ import net.minecraft.util.Formatting;
 public class ConfirmScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     public static final int ROWS = 3;
-    public static final int ITEM_SLOT = 4, CANCEL_SLOT = 10, CONFIRM_SLOT = 16;
+    public static final int
+            ITEM_SLOT = 4,
+            CANCEL_SLOT = 10,
+            CONFIRM_SLOT = 16;
     private MarketItem marketItem;
+    private MarketScreenHandler parent;
 
     public ConfirmScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, new SimpleInventory(ROWS * 9));
@@ -35,7 +38,8 @@ public class ConfirmScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         inventory.onOpen(playerInventory.player);
 
-        ItemStack cancelStack = new ItemStack(Items.RED_STAINED_GLASS_PANE), confirmStack = new ItemStack(Items.GREEN_STAINED_GLASS_PANE);
+        ItemStack cancelStack = new ItemStack(Items.RED_STAINED_GLASS_PANE),
+                confirmStack = new ItemStack(Items.GREEN_STAINED_GLASS_PANE);
         cancelStack.setCustomName(Text.literal("Cancel").formatted(Formatting.RED));
         confirmStack.setCustomName(Text.literal("Confirm").formatted(Formatting.GREEN));
 
@@ -90,7 +94,7 @@ public class ConfirmScreenHandler extends ScreenHandler {
 
                         break;
                     case CANCEL_SLOT:
-                        tryClose(player);
+                        player.openHandledScreen(new SimpleNamedScreenHandlerFactory(((syncId1, playerInventory, player1) -> parent), Text.literal("Market")));
                         break;
                     default:
                         break;
@@ -108,6 +112,12 @@ public class ConfirmScreenHandler extends ScreenHandler {
 
     public void setMarketItem(MarketItem marketItem){
         this.marketItem = marketItem;
-        inventory.setStack(ITEM_SLOT, marketItem.getItemStack());
+        ItemStack itemStack = marketItem.getItemStack().copy();
+        itemStack.setCustomName(Text.translatable("%s - %s", itemStack.getName(), Text.literal(marketItem.getPrice() + "$").formatted(Formatting.GREEN)));
+        inventory.setStack(ITEM_SLOT, itemStack);
+    }
+
+    public void setParent(MarketScreenHandler parent) {
+        this.parent = parent;
     }
 }

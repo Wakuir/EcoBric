@@ -52,20 +52,19 @@ public class MoneyManager {
 
     public static boolean payByUUID(PlayerEntity sender, String receiverUUID, int amount){
         if(take((IEntityDataSaver) sender, amount)) {
-            for (PlayerEntity playerEntity : sender.getServer().getPlayerManager().getPlayerList()) {
-                if (playerEntity.getUuidAsString() == receiverUUID) {
-                    if (pay((IEntityDataSaver) sender, (IEntityDataSaver) playerEntity, amount)) {
-                        return true;
-                    }
+            for (ServerPlayerEntity serverPlayerEntity : sender.getServer().getPlayerManager().getPlayerList()) {
+                if (serverPlayerEntity.getUuidAsString().equals(receiverUUID)) {
+                    add((IEntityDataSaver) serverPlayerEntity, amount);
+                    return true;
                 }
             }
-            MoneyManager.payOfflinePlayer(receiverUUID, amount);
+            addOfflinePlayer(receiverUUID, amount);
             return true;
         }
         return false;
     }
 
-    private static void payOfflinePlayer(String receiverUUID, int amount){
+    private static void addOfflinePlayer(String receiverUUID, int amount){
         try {
             Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 

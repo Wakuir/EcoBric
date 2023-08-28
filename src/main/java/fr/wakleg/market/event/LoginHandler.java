@@ -18,7 +18,6 @@ public class LoginHandler implements ServerEntityEvents.Load {
     public void onLoad(Entity entity, ServerWorld world) {
         if (entity instanceof ServerPlayerEntity){
             ServerPlayerEntity player = (ServerPlayerEntity) entity;
-            Main.LOGGER.info(player.getUuidAsString());
             try {
                 Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 
@@ -31,7 +30,7 @@ public class LoginHandler implements ServerEntityEvents.Load {
                 while (resultSet.next()){
                     if (player.getUuidAsString().equals(resultSet.getString("player_uuid"))){
                         MoneyManager.add((IEntityDataSaver) player, resultSet.getInt("amount"));
-                        String deleteQuery = "DELETE FROM" + OFFLINE_MONEY_TABLE + "WHERE (player_uuid) = (?)";
+                        String deleteQuery = "DELETE FROM " + OFFLINE_MONEY_TABLE + " WHERE (player_uuid) = (?)";
                         PreparedStatement statement = connection.prepareStatement(deleteQuery);
                         statement.setString(1, player.getUuidAsString());
                         statement.executeUpdate();

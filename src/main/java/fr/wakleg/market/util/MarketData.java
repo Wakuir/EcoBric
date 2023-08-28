@@ -36,18 +36,20 @@ public class MarketData {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(compound);
 
-        int indexOfField;
         if(json != null){
-            indexOfField = json.indexOf("field_")
-            json.replace(json.substring(indexOfField, indexOfField + 10), "entries");
-        }
-        while(json.contains("field_")){
-            indexOfField = json.indexOf("field_");
-            String toReplace = "";
-            if(json.substring(indexOfField, indexOfField - 5).contains("[")) toReplace = "entries";
-            else toReplace = "value"
-            
-            json.replace(json.substring(indexOfField, indexOfField + 10), toReplace);
+            if(json.contains("field_")){
+                int indexOfField = json.indexOf("field_");
+                json = json.replace(json.substring(indexOfField, indexOfField + 11), "entries");
+
+                while(json.contains("field_")){
+                    indexOfField = json.indexOf("field_");
+                    String toReplace = "";
+                    if(json.substring(Math.max(0, indexOfField - 10), indexOfField).contains("[")) toReplace = "entries";
+                    else toReplace = "value";
+
+                    json = json.replace(json.substring(indexOfField, indexOfField + 11), toReplace);
+                }
+            }
         }
         return json;
     }
@@ -55,7 +57,6 @@ public class MarketData {
     public static ItemStack ItemStackFromJson(String json) {
         ItemStack itemStack = ItemStack.EMPTY;
         if(json != null) {
-            Main.LOGGER.info(json);
             JsonObject valueObject = JsonParser.parseString(json).getAsJsonObject().getAsJsonObject("entries");
 
             if (valueObject.has("id")) {

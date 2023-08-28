@@ -1,17 +1,16 @@
 package fr.wakleg.market.screen;
 
-import fr.wakleg.market.screen.handler.MarketScreenHandler;
+import fr.wakleg.market.screen.handler.OwnedItemsScreenHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class MarketScreen extends HandledScreen<MarketScreenHandler> {
+public class OwnedItemsScreen extends HandledScreen<OwnedItemsScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("minecraft:textures/gui/container/generic_54.png");
     private final int ROWS;
-
-    public MarketScreen(MarketScreenHandler handler, PlayerInventory inventory, Text title) {
+    public OwnedItemsScreen(OwnedItemsScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         this.ROWS = handler.ROWS;
         this.backgroundHeight = 114 + this.ROWS * 18;
