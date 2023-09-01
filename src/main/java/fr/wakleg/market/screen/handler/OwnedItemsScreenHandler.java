@@ -23,7 +23,8 @@ public class OwnedItemsScreenHandler extends ScreenHandler {
     public static final int ROWS = 6;
     private final Inventory inventory;
     private int page = 0;
-    private int buttonsOffset;
+    private boolean canGoPrev = false, canGoNext = false;
+
     private static List<MarketItem> ownedItems = new ArrayList<>();
     private MarketScreenHandler parent;
 
@@ -84,12 +85,14 @@ public class OwnedItemsScreenHandler extends ScreenHandler {
         buttonNext.setCustomName(Text.literal("Next Page").formatted(Formatting.GOLD));
         buttonBack.setCustomName(Text.literal("Back").formatted(Formatting.RED));
 
-        int buttonPrevIndex = ROWS * 9 - 9 + buttonsOffset;
-        if(page != 0) inventory.setStack(buttonPrevIndex, buttonPrev);
+        int buttonPrevIndex = ROWS * 9 - 9 + MarketScreenHandler.BUTTONS_OFFSET;
+        canGoPrev = page != 0;
+        if(canGoPrev) inventory.setStack(buttonPrevIndex, buttonPrev);
         else inventory.setStack(buttonPrevIndex, ItemStack.EMPTY);
 
-        int buttonNextIndex = ROWS * 9 - 1 - buttonsOffset;
-        if(this.ownedItems.size() > (page + 1) * ROWS * 9 - 9) inventory.setStack(buttonNextIndex, buttonNext);
+        int buttonNextIndex = ROWS * 9 - 1 - MarketScreenHandler.BUTTONS_OFFSET;
+        canGoNext = ownedItems.size() > (page + 1) * ROWS * 9 - 9;
+        if(canGoNext) inventory.setStack(buttonNextIndex, buttonNext);
         else inventory.setStack(buttonNextIndex, ItemStack.EMPTY);
 
         inventory.setStack(ROWS * 9 - 5, buttonBack);
@@ -121,7 +124,14 @@ public class OwnedItemsScreenHandler extends ScreenHandler {
                                 screenHandler.setMarketItem(itemClicked);
                                 return screenHandler;
                             }, Text.literal("Confirm Withdraw ?")));
-                } else if (slotIndex == ROWS * 9 -5) {
+                }
+                else if (slotIndex == MarketScreenHandler.BUTTON_PREV_INDEX && canGoPrev) {
+                    displayOwnedItems(this.page - 1);
+                }
+                else if (slotIndex == MarketScreenHandler.BUTTON_NEXT_INDEX && canGoNext) {
+                    displayOwnedItems(this.page + 1);
+                }
+                else if (slotIndex == MarketScreenHandler.BUTTON_OWNED_ITEMS_INDEX) {
                     player.openHandledScreen(new SimpleNamedScreenHandlerFactory(((syncId1, playerInventory, player1) -> parent), Text.literal("Market")));
                 }
             }
@@ -132,10 +142,6 @@ public class OwnedItemsScreenHandler extends ScreenHandler {
         ownedItems.clear();
         marketItemStream.forEach(marketItem -> ownedItems.add(marketItem));
         displayOwnedItems(page);
-    }
-
-    public void setButtonsOffset(int buttonsOffset) {
-        this.buttonsOffset = buttonsOffset;
     }
 
     public void setParent(MarketScreenHandler parent) {

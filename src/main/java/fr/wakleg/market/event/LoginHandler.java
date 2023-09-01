@@ -21,7 +21,7 @@ public class LoginHandler implements ServerEntityEvents.Load {
             try {
                 Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 
-                String createTableQuery = "CREATE TABLE IF NOT EXISTS " + MARKET_ITEMS_TABLE_NAME + " (id INT AUTO_INCREMENT PRIMARY KEY, json_data TEXT, price INT, owner_uuid TEXT)";
+                String createTableQuery = "CREATE TABLE IF NOT EXISTS " + OFFLINE_MONEY_TABLE + " (player_uuid TEXT, amount INT)";
                 connection.createStatement().execute(createTableQuery);
 
                 String selectQuery = "SELECT player_uuid, amount FROM " + OFFLINE_MONEY_TABLE;

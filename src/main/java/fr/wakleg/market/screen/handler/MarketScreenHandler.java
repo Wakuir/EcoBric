@@ -26,6 +26,7 @@ public class MarketScreenHandler extends ScreenHandler {
             BUTTON_OWNED_ITEMS_INDEX = ROWS * 9 - 5;
     private final Inventory inventory;
     private int page = 0;
+    private boolean canGoPrev = false, canGoNext = false;
     private static List<MarketItem> marketItems;
 
     public MarketScreenHandler(int syncId, PlayerInventory inventory){
@@ -89,8 +90,14 @@ public class MarketScreenHandler extends ScreenHandler {
         buttonNext.setCustomName(Text.literal("Next Page").formatted(Formatting.GOLD));
         buttonOwnedItems.setCustomName(Text.literal("Your Items").formatted(Formatting.LIGHT_PURPLE));
 
-        inventory.setStack(BUTTON_PREV_INDEX, buttonPrev);
-        inventory.setStack(BUTTON_NEXT_INDEX, buttonNext);
+        canGoPrev = page != 0;
+        if(canGoPrev) inventory.setStack(BUTTON_PREV_INDEX, buttonPrev);
+        else inventory.setStack(BUTTON_PREV_INDEX, ItemStack.EMPTY);
+
+        canGoNext = marketItems.size() > (page + 1) * ROWS * 9 - 9;
+        if(canGoNext) inventory.setStack(BUTTON_NEXT_INDEX, buttonNext);
+        else inventory.setStack(BUTTON_NEXT_INDEX, ItemStack.EMPTY);
+
         inventory.setStack(BUTTON_OWNED_ITEMS_INDEX, buttonOwnedItems);
 
     }
@@ -126,20 +133,17 @@ public class MarketScreenHandler extends ScreenHandler {
                                 return screenHandler;
                             }, Text.literal(confirmTitle)));
                 }
-                 else if (slotIndex == BUTTON_PREV_INDEX) {
-                        if(page != 0)
-                            displayMarketItems(this.page - 1);
+                else if (slotIndex == BUTTON_PREV_INDEX && canGoPrev) {
+                    displayMarketItems(this.page - 1);
                 }
-                 else if (slotIndex == BUTTON_NEXT_INDEX) {
-                    if(this.marketItems.size() > (page + 1) * ROWS * 9 - 9)
-                        displayMarketItems(this.page + 1);
+                else if (slotIndex == BUTTON_NEXT_INDEX && canGoNext) {
+                    displayMarketItems(this.page + 1);
                 }
-                 else if(slotIndex == BUTTON_OWNED_ITEMS_INDEX){
+                else if(slotIndex == BUTTON_OWNED_ITEMS_INDEX ){
                     player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
                             ((syncId1, playerInventory, player1) -> {
                                 OwnedItemsScreenHandler screenHandler = new OwnedItemsScreenHandler(syncId1, playerInventory);
                                 screenHandler.setItemsList(marketItems.stream().filter(marketItem -> marketItem.getOwnerUUID().equals(player.getUuidAsString())));
-                                screenHandler.setButtonsOffset(BUTTONS_OFFSET);
                                 screenHandler.setParent(this);
                                 return screenHandler;
                             }),

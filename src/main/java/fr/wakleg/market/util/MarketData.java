@@ -18,9 +18,9 @@ import java.util.List;
 public class MarketData {
     private static List<MarketItem> marketItems = new ArrayList<>();
     public static final String
-            URL =  "jdbc:mysql://u446_TFLe3kPIez:esEJVRc5%2BvyA!kDIzqNRmd9!@136.243.63.156:3306/s446_Market",
-            USERNAME = "u446_TFLe3kPIez",
-            PASSWORD = "esEJVRc5+vyA!kDIzqNRmd9!",
+            URL =  "jdbc:mysql://u542_K1iZ0yQvSY:yBTOA.jUuno%3DC!A3XIEwGdDP@136.243.63.156:3306/s542_Market",
+            USERNAME = "u542_K1iZ0yQvSY",
+            PASSWORD = "yBTOA.jUuno=C!A3XIEwGdDP",
             MARKET_ITEMS_TABLE_NAME = "market_items";
 
     public static List<MarketItem> getMarketItems(){
