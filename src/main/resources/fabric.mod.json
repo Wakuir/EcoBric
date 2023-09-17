@@ -23,6 +23,10 @@
 			"fr.wakleg.ecobric.Client",
 			"fr.wakleg.market.Client"
 		],
+		"server": [
+			"fr.wakleg.ecobric.Server",
+			"fr.wakleg.market.Server"
+		],
 		"fabric-datagen": [
 			"fr.wakleg.ecobric.DataGenerator"
 		]

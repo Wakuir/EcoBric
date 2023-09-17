@@ -11,11 +11,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 public class Main implements ModInitializer {
     @Override
     public void onInitialize() {
+        ModScreenHandlers.registerAllScreenHandlers();
         CommandRegistrationCallback.EVENT.register(MarketCommand::register);
         CommandRegistrationCallback.EVENT.register(SellCommand::register);
-
         ServerEntityEvents.ENTITY_LOAD.register(new LoginHandler());
-
-        ModScreenHandlers.registerAllScreenHandlers();
     }
 }

@@ -18,13 +18,6 @@ public class Main implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Initializing Mod " + MOD_ID);
-
-		CommandRegistrationCallback.EVENT.register(MoneyCommand::register);
-		CommandRegistrationCallback.EVENT.register(WithdrawCommand::register);
-		CommandRegistrationCallback.EVENT.register(PayCommand::register);
-
-		ServerPlayerEvents.COPY_FROM.register(new ModPlayerEventCopyFrom());
-
 		ModItems.registerModItems();
 	}
 }

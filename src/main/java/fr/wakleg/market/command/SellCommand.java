@@ -19,8 +19,8 @@ public class SellCommand {
         dispatcher.register(CommandManager.literal("sell")
                 .then(CommandManager.argument("price", IntegerArgumentType.integer())
                         .executes(SellCommand::sell)
-                        /*.then(CommandManager.argument("count", IntegerArgumentType.integer())
-                                .executes(SellCommand::sell))*/));
+                        .then(CommandManager.argument("count", IntegerArgumentType.integer())
+                                .executes(SellCommand::sell))));
     }
 
     private static int sell(CommandContext<ServerCommandSource> context) {
@@ -28,9 +28,10 @@ public class SellCommand {
         PlayerInventory inventory = player.getInventory();
         ItemStack heldStack = inventory.getStack(inventory.selectedSlot);
 
+        int amount = heldStack.getCount();
         if (!heldStack.isEmpty()) {
             try {
-                heldStack.setCount(IntegerArgumentType.getInteger(context, "count"));
+                amount = IntegerArgumentType.getInteger(context, "count");
             } catch (IllegalArgumentException e){}
 
             int price = IntegerArgumentType.getInteger(context, "price");
@@ -38,9 +39,11 @@ public class SellCommand {
 
             int contained = contained(heldStack, player.getInventory());
             if (contained != -1) {
-                MarketData.saveJsonToDatabase(new MarketItem(-1, heldStack, price, ownerUUID));
+                ItemStack stackToSave = heldStack.copy();
+                stackToSave.setCount(amount);
+                MarketData.saveJsonToDatabase(new MarketItem(-1, stackToSave, price, ownerUUID));
                 context.getSource().sendFeedback(() -> Text.literal("Your item has been saved to the market"), false);
-                player.getInventory().removeOne(heldStack);
+                heldStack.decrement(amount);
             } else {
                 context.getSource().sendFeedback(() -> Text.literal("Please hold these items if you want to sell them."), false);
                 return -1;
@@ -50,7 +53,6 @@ public class SellCommand {
             context.getSource().sendFeedback(() -> Text.literal("You can't make money with nothing, go to work now."), false);
             return -1;
         }
-
 
         return 0;
     }
