@@ -15,13 +15,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fr.wakleg.market.Server.saver;
+
 public class MarketData {
     private static List<MarketItem> marketItems = new ArrayList<>();
     public static final String
-            URL =  "jdbc:mysql://u542_K1iZ0yQvSY:yBTOA.jUuno%3DC!A3XIEwGdDP@136.243.63.156:3306/s542_Market",
-            USERNAME = "u542_K1iZ0yQvSY",
-            PASSWORD = "yBTOA.jUuno=C!A3XIEwGdDP",
-            MARKET_ITEMS_TABLE_NAME = "market_items";
+            URL =  saver.get("DbUrl"),
+            USERNAME = saver.get("DbUser"),
+            PASSWORD = saver.get("DbPassword"),
+            MARKET_ITEMS_TABLE_NAME = saver.get("DbTableName");
 
     public static List<MarketItem> getMarketItems(){
         marketItems.clear();
