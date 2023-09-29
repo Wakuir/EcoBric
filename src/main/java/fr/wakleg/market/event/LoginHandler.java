@@ -18,6 +18,7 @@ public class LoginHandler implements ServerEntityEvents.Load {
     public void onLoad(Entity entity, ServerWorld world) {
         if (entity instanceof ServerPlayerEntity){
             ServerPlayerEntity player = (ServerPlayerEntity) entity;
+            Main.LOGGER.info("coucou");
             try {
                 Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 

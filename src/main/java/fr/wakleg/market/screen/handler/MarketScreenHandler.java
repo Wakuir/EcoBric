@@ -40,8 +40,6 @@ public class MarketScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         inventory.onOpen(playerInventory.player);
 
-        this.marketItems = MarketData.getMarketItems();
-
         //Market Slots
         for (int j = 0; j < ROWS; ++j) {
             for (int k = 0; k < 9; ++k) {
@@ -49,8 +47,6 @@ public class MarketScreenHandler extends ScreenHandler {
                 this.addSlot(new NonInteractiveSlot(inventory, index, 8 + k * 18, 18 + j * 18));
             }
         }
-
-        displayMarketItems(page);
 
         //Player Inventory
         int i = (ROWS - 4) * 18;
@@ -151,5 +147,10 @@ public class MarketScreenHandler extends ScreenHandler {
                 }
             }
         }
+    }
+
+    public void setItemsList(List<MarketItem> marketItems) {
+        this.marketItems = marketItems;
+        displayMarketItems(page);
     }
 }
