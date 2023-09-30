@@ -23,7 +23,7 @@ public class MarketData {
             URL =  saver.get("DbUrl"),
             USERNAME = saver.get("DbUser"),
             PASSWORD = saver.get("DbPassword"),
-            MARKET_ITEMS_TABLE_NAME = saver.get("DbTableName");
+            MARKET_ITEMS_TABLE_NAME = saver.get("DbMarketTableName");
 
     public static List<MarketItem> getMarketItems(){
         marketItems.clear();
