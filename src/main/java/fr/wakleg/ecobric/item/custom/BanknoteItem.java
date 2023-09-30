@@ -1,5 +1,6 @@
 package fr.wakleg.ecobric.item.custom;
 
+import fr.wakleg.ecobric.Main;
 import fr.wakleg.ecobric.util.IEntityDataSaver;
 import fr.wakleg.ecobric.util.MoneyManager;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,9 +17,11 @@ public class BanknoteItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack heldItemStack = user.getStackInHand(hand);
-        user.getInventory().removeOne(heldItemStack);
-        MoneyManager.add((IEntityDataSaver) user, heldItemStack.getCount());
+        if (!user.getWorld().isClient()){
+            ItemStack heldItemStack = user.getStackInHand(hand);
+            user.getInventory().removeOne(heldItemStack);
+            MoneyManager.add((IEntityDataSaver) user, heldItemStack.getCount());
+        }
 
         return TypedActionResult.pass(user.getStackInHand(hand));
     }
