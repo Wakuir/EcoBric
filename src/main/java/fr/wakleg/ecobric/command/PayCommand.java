@@ -1,7 +1,6 @@
 package fr.wakleg.ecobric.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -23,12 +22,12 @@ public class PayCommand {
     }
 
     private static int pay(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        IEntityDataSaver sender = (IEntityDataSaver) context.getSource().getPlayer();
+        ServerPlayerEntity sender = context.getSource().getPlayer();
         ServerPlayerEntity receiver = EntityArgumentType.getPlayer(context, "receiver");
         int amount = IntegerArgumentType.getInteger(context, "amount");
 
-        if(MoneyManager.pay(sender, (IEntityDataSaver) receiver, amount)){
-            context.getSource().sendFeedback(() -> Text.translatable("Successfully given %s to %s. You now have %s in your balance.", Text.literal(amount + "$"), Text.literal(receiver.getName() +""), Text.literal(MoneyManager.getMoney(sender) + "$")), false);
+        if(MoneyManager.payByUUID(sender, receiver.getUuidAsString(), amount)){
+            context.getSource().sendFeedback(() -> Text.translatable("Successfully given %s to %s. You now have %s in your balance.", Text.literal(amount + "$"), Text.literal(receiver.getName() +""), Text.literal(MoneyManager.getMoney((IEntityDataSaver) sender) + "$")), false);
         }
         return 0;
     }

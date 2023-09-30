@@ -1,6 +1,5 @@
 package fr.wakleg.market.event;
 
-import fr.wakleg.ecobric.Main;
 import fr.wakleg.ecobric.util.IEntityDataSaver;
 import fr.wakleg.ecobric.util.MoneyManager;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -39,7 +38,7 @@ public class LoginHandler implements ServerEntityEvents.Load {
 
                 connection.close();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }

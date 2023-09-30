@@ -6,15 +6,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import static fr.wakleg.market.Server.saver;
+
+import java.sql.*;
 
 import static fr.wakleg.market.util.MarketData.*;
 
 public class MoneyManager {
-    public static final String OFFLINE_MONEY_TABLE = "offline_money";
+    public static final String OFFLINE_MONEY_TABLE = saver.get("DbOfflineMoneyTableName");
 
     public static final String KEY_MONEY = "money";
 
@@ -42,14 +41,6 @@ public class MoneyManager {
         return false;
     }
 
-    public static boolean pay(IEntityDataSaver sender, IEntityDataSaver receiver, int amount){
-        if(take(sender, amount)) {
-            add(receiver, amount);
-            return true;
-        }
-        return false;
-    }
-
     public static boolean payByUUID(PlayerEntity sender, String receiverUUID, int amount){
         if(take((IEntityDataSaver) sender, amount)) {
             for (ServerPlayerEntity serverPlayerEntity : sender.getServer().getPlayerManager().getPlayerList()) {
@@ -71,12 +62,25 @@ public class MoneyManager {
             String createTableQuery = "CREATE TABLE IF NOT EXISTS " + OFFLINE_MONEY_TABLE + " (player_uuid TEXT, amount INT)";
             connection.createStatement().execute(createTableQuery);
 
-            String insertDataQuery = "INSERT INTO " + OFFLINE_MONEY_TABLE + " (player_uuid, amount) VALUES (?, ?)";
-            PreparedStatement insertStatement = connection.prepareStatement(insertDataQuery);
-            insertStatement.setString(1, receiverUUID);
-            insertStatement.setInt(2, amount);
-            insertStatement.executeUpdate();
+            String selectQuery = "SELECT amount FROM " + OFFLINE_MONEY_TABLE + " WHERE player_uuid = (?)";
+            PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+            selectStatement.setString(1, receiverUUID);
+            ResultSet results = selectStatement.executeQuery();
 
+            if(results.next()){
+                String updateQuery = "UPDATE " + OFFLINE_MONEY_TABLE + " SET amount = (?) WHERE player_uuid = (?)";
+                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+                updateStatement.setInt(1, results.getInt("amount") + amount);
+                updateStatement.setString(2, receiverUUID);
+                updateStatement.execute();
+            }
+            else{
+                String insertDataQuery = "INSERT INTO " + OFFLINE_MONEY_TABLE + " (player_uuid, amount) VALUES (?, ?)";
+                PreparedStatement insertStatement = connection.prepareStatement(insertDataQuery);
+                insertStatement.setString(1, receiverUUID);
+                insertStatement.setInt(2, amount);
+                insertStatement.executeUpdate();
+            }
             connection.close();
         }catch (SQLException e){
             e.printStackTrace();
