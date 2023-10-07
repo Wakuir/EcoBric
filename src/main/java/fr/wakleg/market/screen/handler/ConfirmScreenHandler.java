@@ -89,16 +89,17 @@ public class ConfirmScreenHandler extends ScreenHandler {
                             if(MoneyManager.payByUUID(player, marketItem.ownerUUID(), marketItem.price())) {
                                 player.getInventory().insertStack(marketItem.itemStack());
                                 MarketData.removeItemFromDatabase(marketItem);
-                                tryClose(player);
                             }
                             else player.sendMessage(Text.literal("You don't have enough money to buy this.").formatted(Formatting.RED));
                         }
                         else player.sendMessage(Text.literal("This item is no longer available"));
-
+                        tryClose(player);
                         break;
+
                     case CANCEL_SLOT:
                         player.openHandledScreen(new SimpleNamedScreenHandlerFactory(((syncId1, playerInventory, player1) -> parent), Text.literal("Market")));
                         break;
+
                     default:
                         break;
                 }
