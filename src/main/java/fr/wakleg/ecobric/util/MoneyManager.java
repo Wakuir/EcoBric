@@ -88,7 +88,6 @@ public class MoneyManager {
                 insertStatement.setInt(2, amount);
                 insertStatement.executeUpdate();
             }
-            connection.close();
         }catch (SQLException e){
             e.printStackTrace();
         }
