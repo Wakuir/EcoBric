@@ -1,6 +1,8 @@
 package fr.wakleg.market;
 
 import fr.wakleg.Saver;
+import fr.wakleg.ecobric.util.MoneyManager;
+import fr.wakleg.market.util.MarketData;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -19,5 +21,8 @@ public class Server implements DedicatedServerModInitializer {
                 saver.set(arg, "");
             }
         }
+
+        MarketData.initDatabase();
+        MoneyManager.initDatabase();
     }
 }

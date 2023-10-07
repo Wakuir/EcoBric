@@ -1,7 +1,6 @@
 package fr.wakleg.market.util;
 
 import com.google.gson.*;
-import fr.wakleg.ecobric.Main;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
@@ -24,6 +23,18 @@ public class MarketData {
             USERNAME = saver.get("DbUser"),
             PASSWORD = saver.get("DbPassword"),
             MARKET_ITEMS_TABLE_NAME = saver.get("DbMarketTableName");
+
+    public static Connection connection;
+
+    public static void initDatabase() {
+        try {
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            String createTableQuery = "CREATE TABLE IF NOT EXISTS " + MARKET_ITEMS_TABLE_NAME + " (id INT AUTO_INCREMENT PRIMARY KEY, json_data TEXT, price INT, owner_uuid TEXT)";
+            connection.createStatement().execute(createTableQuery);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static List<MarketItem> getMarketItems(){
         marketItems.clear();
@@ -175,42 +186,29 @@ public class MarketData {
 
     public static void saveJsonToDatabase(MarketItem marketItem){
         try {
-            // Create a connection to the MySQL database
-            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-
-            // Create a table (if it doesn't exist) to store the JSON data
-            String createTableQuery = "CREATE TABLE IF NOT EXISTS " + MARKET_ITEMS_TABLE_NAME + " (id INT AUTO_INCREMENT PRIMARY KEY, json_data TEXT, price INT, owner_uuid TEXT)";
-            connection.createStatement().execute(createTableQuery);
-
-            // Insert the JSON data into the table
             String insertDataQuery = "INSERT INTO " + MARKET_ITEMS_TABLE_NAME + " (json_data, price, owner_uuid) VALUES (?, ?, ?)";
             PreparedStatement insertStatement = connection.prepareStatement(insertDataQuery);
-            insertStatement.setString(1, JsonFromItemStack(marketItem.getItemStack()));
-            insertStatement.setInt(2, marketItem.getPrice());
-            insertStatement.setString(3, marketItem.getOwnerUUID());
+            insertStatement.setString(1, JsonFromItemStack(marketItem.itemStack()));
+            insertStatement.setInt(2, marketItem.price());
+            insertStatement.setString(3, marketItem.ownerUUID());
             insertStatement.executeUpdate();
 
-            // Close the connection
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public static void removeItemFromDatabase(MarketItem item){
-        removeItemFromDatabase(item.getId());
+        removeItemFromDatabase(item.id());
     }
 
     public static void removeItemFromDatabase(int id){
         try {
-            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-
             String deleteQuery = "DELETE FROM " + MARKET_ITEMS_TABLE_NAME + " WHERE (id) = (?)";
             PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
             deleteStatement.setInt(1, id);
             deleteStatement.executeUpdate();
 
-            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -219,7 +217,6 @@ public class MarketData {
     public static List<MarketItem> loadDataFromDatabase() {
         try {
             List<MarketItem> marketItemList = new ArrayList<>();
-            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 
             String selectDataQuery = "SELECT * FROM " + MARKET_ITEMS_TABLE_NAME;
             ResultSet resultSet = connection.createStatement().executeQuery(selectDataQuery);
@@ -233,13 +230,18 @@ public class MarketData {
                 marketItemList.add(new MarketItem(id, itemStack, price, ownerUUID));
             }
 
-            connection.close();
-
             return marketItemList;
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return null;
+    }
+
+    public static boolean isAvailable(int id){
+        for (MarketItem item : getMarketItems()) {
+            if(item.id() == id) return true;
+        }
+        return false;
     }
 }

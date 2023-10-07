@@ -1,6 +1,5 @@
 package fr.wakleg.market.event;
 
-import fr.wakleg.ecobric.Main;
 import fr.wakleg.ecobric.util.IEntityDataSaver;
 import fr.wakleg.ecobric.util.MoneyManager;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -12,7 +11,7 @@ import net.minecraft.text.Text;
 import java.sql.*;
 
 import static fr.wakleg.ecobric.util.MoneyManager.OFFLINE_MONEY_TABLE;
-import static fr.wakleg.market.util.MarketData.*;
+import static fr.wakleg.market.util.MarketData.connection;
 
 public class LoginHandler implements ServerEntityEvents.Load {
     @Override
@@ -21,11 +20,6 @@ public class LoginHandler implements ServerEntityEvents.Load {
             ServerPlayerEntity player = (ServerPlayerEntity) entity;
             if(!player.getWorld().isClient()){
                 try {
-                    Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-
-                    String createTableQuery = "CREATE TABLE IF NOT EXISTS " + OFFLINE_MONEY_TABLE + " (player_uuid TEXT, amount INT)";
-                    connection.createStatement().execute(createTableQuery);
-
                     String selectQuery = "SELECT amount FROM " + OFFLINE_MONEY_TABLE + " WHERE player_uuid = (?)";
                     PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
                     selectStatement.setString(1, player.getUuidAsString());
@@ -41,7 +35,6 @@ public class LoginHandler implements ServerEntityEvents.Load {
                         statement.executeUpdate();
                     }
 
-                    connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

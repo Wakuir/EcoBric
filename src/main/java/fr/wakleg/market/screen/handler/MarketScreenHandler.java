@@ -1,7 +1,6 @@
 package fr.wakleg.market.screen.handler;
 
 import fr.wakleg.market.screen.slot.NonInteractiveSlot;
-import fr.wakleg.market.util.MarketData;
 import fr.wakleg.market.util.MarketItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -67,8 +66,8 @@ public class MarketScreenHandler extends ScreenHandler {
         for (int i = 0; i < 45; i++) {
             try {
                 MarketItem item = this.marketItems.get(page * 45 + i);
-                ItemStack itemStack =  item.getItemStack().copy();
-                itemStack.setCustomName(Text.translatable("%s - %s", itemStack.getName(), Text.literal(item.getPrice() + "$").formatted(Formatting.GREEN)));
+                ItemStack itemStack =  item.itemStack().copy();
+                itemStack.setCustomName(Text.translatable("%s - %s", itemStack.getName(), Text.literal(item.price() + "$").formatted(Formatting.GREEN)));
                 inventory.setStack(i, itemStack);
             }catch (IndexOutOfBoundsException e){
                 inventory.setStack(i, ItemStack.EMPTY);
@@ -118,7 +117,7 @@ public class MarketScreenHandler extends ScreenHandler {
                 if(slotIndex >= 0 && slotIndex <= 44) {
                     MarketItem itemClicked = marketItems.get(this.page * 45 + slotIndex);
                     String confirmTitle = "";
-                    if(itemClicked.getOwnerUUID().equals(player.getUuidAsString())) confirmTitle = "Confirm Withdraw ?";
+                    if(itemClicked.ownerUUID().equals(player.getUuidAsString())) confirmTitle = "Confirm Withdraw ?";
                     else confirmTitle = "Confirm Purchase ?";
 
                     player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
@@ -139,7 +138,7 @@ public class MarketScreenHandler extends ScreenHandler {
                     player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
                             ((syncId1, playerInventory, player1) -> {
                                 OwnedItemsScreenHandler screenHandler = new OwnedItemsScreenHandler(syncId1, playerInventory);
-                                screenHandler.setItemsList(marketItems.stream().filter(marketItem -> marketItem.getOwnerUUID().equals(player.getUuidAsString())));
+                                screenHandler.setItemsList(marketItems.stream().filter(marketItem -> marketItem.ownerUUID().equals(player.getUuidAsString())));
                                 screenHandler.setParent(this);
                                 return screenHandler;
                             }),

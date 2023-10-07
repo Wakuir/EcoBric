@@ -66,8 +66,8 @@ public class OwnedItemsScreenHandler extends ScreenHandler {
         for (int i = 0; i < 45; i++) {
             try {
                 MarketItem item = this.ownedItems.get(page * 45 + i);
-                ItemStack itemStack =  item.getItemStack().copy();
-                itemStack.setCustomName(Text.translatable("%s - %s", itemStack.getName(), Text.literal(item.getPrice() + "$").formatted(Formatting.GREEN)));
+                ItemStack itemStack =  item.itemStack().copy();
+                itemStack.setCustomName(Text.translatable("%s - %s", itemStack.getName(), Text.literal(item.price() + "$").formatted(Formatting.GREEN)));
                 inventory.setStack(i, itemStack);
             }catch (IndexOutOfBoundsException e){
                 inventory.setStack(i, ItemStack.EMPTY);

@@ -85,12 +85,15 @@ public class ConfirmScreenHandler extends ScreenHandler {
             if (!inventory.getStack(slotIndex).isEmpty()) {
                 switch (slotIndex) {
                     case CONFIRM_SLOT:
-                        if(MoneyManager.payByUUID(player, marketItem.getOwnerUUID().toString(), marketItem.getPrice())) {
-                            player.getInventory().insertStack(marketItem.getItemStack());
-                            MarketData.removeItemFromDatabase(marketItem);
-                            tryClose(player);
+                        if(MarketData.isAvailable(marketItem.id())){
+                            if(MoneyManager.payByUUID(player, marketItem.ownerUUID(), marketItem.price())) {
+                                player.getInventory().insertStack(marketItem.itemStack());
+                                MarketData.removeItemFromDatabase(marketItem);
+                                tryClose(player);
+                            }
+                            else player.sendMessage(Text.literal("You don't have enough money to buy this.").formatted(Formatting.RED));
                         }
-                        else player.sendMessage(Text.literal("You don't have enough money to buy this.").formatted(Formatting.RED));
+                        else player.sendMessage(Text.literal("This item is no longer available"));
 
                         break;
                     case CANCEL_SLOT:
@@ -104,16 +107,15 @@ public class ConfirmScreenHandler extends ScreenHandler {
     }
 
     private void tryClose(PlayerEntity player){
-        if (player instanceof ServerPlayerEntity) {
-            ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) player;
+        if (player instanceof ServerPlayerEntity serverPlayerEntity) {
             serverPlayerEntity.closeHandledScreen();
         }
     }
 
     public void setMarketItem(MarketItem marketItem){
         this.marketItem = marketItem;
-        ItemStack itemStack = marketItem.getItemStack().copy();
-        itemStack.setCustomName(Text.translatable("%s - %s", itemStack.getName(), Text.literal(marketItem.getPrice() + "$").formatted(Formatting.GREEN)));
+        ItemStack itemStack = marketItem.itemStack().copy();
+        itemStack.setCustomName(Text.translatable("%s - %s", itemStack.getName(), Text.literal(marketItem.price() + "$").formatted(Formatting.GREEN)));
         inventory.setStack(ITEM_SLOT, itemStack);
     }
 
