@@ -20,7 +20,7 @@ public class MoneyManager {
     public static void initDatabase() {
         try {
             String createTableQuery = "CREATE TABLE IF NOT EXISTS " + OFFLINE_MONEY_TABLE + " (player_uuid TEXT, amount INT)";
-            connection.createStatement().executeQuery(createTableQuery);
+            connection.createStatement().execute(createTableQuery);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
