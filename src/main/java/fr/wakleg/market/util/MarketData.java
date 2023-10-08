@@ -24,11 +24,9 @@ public class MarketData {
             PASSWORD = saver.get("DbPassword"),
             MARKET_ITEMS_TABLE_NAME = saver.get("DbMarketTableName");
 
-    public static Connection connection;
-
     public static void initDatabase() {
         try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
             String createTableQuery = "CREATE TABLE IF NOT EXISTS " + MARKET_ITEMS_TABLE_NAME + " (id INT AUTO_INCREMENT PRIMARY KEY, json_data TEXT, price INT, owner_uuid TEXT)";
             connection.createStatement().execute(createTableQuery);
         } catch (SQLException e) {
@@ -186,6 +184,8 @@ public class MarketData {
 
     public static void saveJsonToDatabase(MarketItem marketItem){
         try {
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
             String insertDataQuery = "INSERT INTO " + MARKET_ITEMS_TABLE_NAME + " (json_data, price, owner_uuid) VALUES (?, ?, ?)";
             PreparedStatement insertStatement = connection.prepareStatement(insertDataQuery);
             insertStatement.setString(1, JsonFromItemStack(marketItem.itemStack()));
@@ -193,6 +193,7 @@ public class MarketData {
             insertStatement.setString(3, marketItem.ownerUUID());
             insertStatement.executeUpdate();
 
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -204,11 +205,14 @@ public class MarketData {
 
     public static void removeItemFromDatabase(int id){
         try {
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
             String deleteQuery = "DELETE FROM " + MARKET_ITEMS_TABLE_NAME + " WHERE (id) = (?)";
             PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
             deleteStatement.setInt(1, id);
             deleteStatement.executeUpdate();
 
+            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -217,6 +221,7 @@ public class MarketData {
     public static List<MarketItem> loadDataFromDatabase() {
         try {
             List<MarketItem> marketItemList = new ArrayList<>();
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 
             String selectDataQuery = "SELECT * FROM " + MARKET_ITEMS_TABLE_NAME;
             ResultSet resultSet = connection.createStatement().executeQuery(selectDataQuery);
@@ -229,6 +234,8 @@ public class MarketData {
 
                 marketItemList.add(new MarketItem(id, itemStack, price, ownerUUID));
             }
+
+            connection.close();
 
             return marketItemList;
         } catch (SQLException e) {

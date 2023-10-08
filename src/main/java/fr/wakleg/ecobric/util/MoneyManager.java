@@ -19,8 +19,12 @@ public class MoneyManager {
 
     public static void initDatabase() {
         try {
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
             String createTableQuery = "CREATE TABLE IF NOT EXISTS " + OFFLINE_MONEY_TABLE + " (player_uuid TEXT, amount INT)";
             connection.createStatement().execute(createTableQuery);
+
+            connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -66,6 +70,8 @@ public class MoneyManager {
 
     private static void addOfflinePlayer(String receiverUUID, int amount){
         try {
+            Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
             String createTableQuery = "CREATE TABLE IF NOT EXISTS " + OFFLINE_MONEY_TABLE + " (player_uuid TEXT, amount INT)";
             connection.createStatement().execute(createTableQuery);
 
@@ -88,6 +94,8 @@ public class MoneyManager {
                 insertStatement.setInt(2, amount);
                 insertStatement.executeUpdate();
             }
+
+            connection.close();
         }catch (SQLException e){
             e.printStackTrace();
         }

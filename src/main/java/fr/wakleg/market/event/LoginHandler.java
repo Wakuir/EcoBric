@@ -11,15 +11,16 @@ import net.minecraft.text.Text;
 import java.sql.*;
 
 import static fr.wakleg.ecobric.util.MoneyManager.OFFLINE_MONEY_TABLE;
-import static fr.wakleg.market.util.MarketData.connection;
+import static fr.wakleg.market.util.MarketData.*;
 
 public class LoginHandler implements ServerEntityEvents.Load {
     @Override
     public void onLoad(Entity entity, ServerWorld world) {
-        if (entity instanceof ServerPlayerEntity){
-            ServerPlayerEntity player = (ServerPlayerEntity) entity;
+        if (entity instanceof ServerPlayerEntity player){
             if(!player.getWorld().isClient()){
                 try {
+                    Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
                     String selectQuery = "SELECT amount FROM " + OFFLINE_MONEY_TABLE + " WHERE player_uuid = (?)";
                     PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
                     selectStatement.setString(1, player.getUuidAsString());
@@ -35,6 +36,7 @@ public class LoginHandler implements ServerEntityEvents.Load {
                         statement.executeUpdate();
                     }
 
+                    connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
